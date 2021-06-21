@@ -17,10 +17,6 @@ def users(request):
         name = request.POST['name']
         email = request.POST['email']
         password = request.POST['password']
-        profession = request.POST['profession']
-        phone_no = request.POST['phone_no']
-        image = request.POST['image']
-        images = base64_to_image(image)
 
         if Users.objects.filter(email=email).exists():
 
@@ -33,11 +29,6 @@ def users(request):
             data = {}
             data['error'] = 'True'
             data['error_msg'] = 'Password must be contain 6 characters!!'
-            return JsonResponse(data)
-        elif Users.objects.filter(phone_no=phone_no).exists():
-            data = {}
-            data['error'] = 'True'
-            data['error_msg'] = 'Phone Number Already Exists!!'
             return JsonResponse(data)
         
         elif name != name.strip():
@@ -59,7 +50,7 @@ def users(request):
             return JsonResponse(data)
 
         else:
-            user = Users(name=name, email=email, password=password, profession=profession, phone_no=phone_no, image=images)
+            user = Users(name=name, email=email, password=password, profession=profession, phone_no="",address="", image=images)
             user.save()
             social = Social_links(user_id=user.pk)
             social.save()
@@ -83,78 +74,43 @@ def users(request):
         data['error_msg'] = 'Method not supported'
         return JsonResponse(data)
         
-def base64_to_image(base64_string):
-    format, imgstr = base64_string.split(';base64,')
-    ext = format.split('/')[-1]
-    return ContentFile(base64.b64decode(imgstr), name=uuid4().hex + "." + ext)
 
 @csrf_exempt
 def update_profile(request):
     if request.method == "POST":
+        user_id = request.POST['user_id']
         name = request.POST['name']
-        email = request.POST['email']
-        password = request.POST['password']
         profession = request.POST['profession']
         phone_no = request.POST['phone_no']
         image = request.POST['image']
-        images = base64_to_image(image)
+        # images = base64_to_image(image)
 
-        update = Users.objects.get(email=email)
 
-        if Users.objects.filter(email=email).exists():
+        if Users.objects.filter(id=user_id).exists():
+            update = Users.objects.get(id=user_id)
 
-            if int(len(password)) < 6:
-                data = {}
-                data['error'] = 'True'
-                data['error_msg'] = 'Password must be contain 6 characters!!'
-                return JsonResponse(data)
-            elif Users.objects.filter(phone_no=phone_no).exists():
-                data = {}
-                data['error'] = 'True'
-                data['error_msg'] = 'Phone Number Already Exists!!'
-                return JsonResponse(data)
-                # if phone_no == update.phone_no:
-                #      update.phone_no=phone_no
-                # else:
-                #     data = {}
-                #     data['error'] = 'True'
-                #     data['error_msg'] = 'Phone Number Already Exists!!'
-                #     return JsonResponse(data)
             
-            elif name != name.strip():
+            if name != name.strip():
                 data = {}
                 data['error'] = 'True'
                 data['error_msg'] = 'Name field is required'
                 return JsonResponse(data)
-            
-            elif email != email.strip():
-                data = {}
-                data['error'] = 'True'
-                data['error_msg'] = 'Email field is required'
-                return JsonResponse(data)
-            
-            elif password != password.strip():
-                data = {}
-                data['error'] = 'True'
-                data['error_msg'] = 'Password field is required'
-                return JsonResponse(data)
 
             else:
-                # update = Users.objects.get(email=email)
                 update.name=name
-                update.email=email
-                update.password=password
                 update.profession=profession
                 update.phone_no=phone_no
-                update.image=images
+                if image != "":
+                    images = base64_to_image(image)    
+                    update.image=images
                 update.save()
                 # user = Users.objects.get(id=user.pk)
             
                 data = {}
                 data['error'] = 'False'
                 data['success_msg'] = 'Update successfully'
-                # data['users'] = serializers.serialize("json", [Users.objects.get(id=user.pk)])
-                # data['users'] = json.loads(data['users'])
+                data['users'] = serializers.serialize("json", [Users.objects.get(id=update.pk)])
+                data['users'] = json.loads(data['users'])
                 return JsonResponse(data)
             
                 # return HttpResponse(json.dumps(response), content_type="application/json")
@@ -163,7 +119,7 @@ def update_profile(request):
         else:
             data = {}
             data['error'] = 'True'
-            data['error_msg'] = 'Email Does Not Exists!!'
+            data['error_msg'] = 'User Does Not Exists!!'
             return JsonResponse(data)    
  
     else:
@@ -197,14 +153,16 @@ def login(request):
                 data['success_msg'] = 'Successfully login!!'
                 data['users'] = serializers.serialize("json", [Users.objects.get(id=user.pk)])
                 data['users'] = json.loads(data['users'])
+                # S = social_links.Social_links.objects.all()
+                # print(S)
                 return JsonResponse(data)
+
                 # print("yes")
                 # data = {}
                 # data['error'] = 'False'
                 # data['error_msg'] = 'Password Match!!'
                 # return JsonResponse(data)
             else:
-                print("No")
                 data = {}
                 data['error'] = 'True'
                 data['error_msg'] = 'Password Not Match!!'
@@ -246,7 +204,9 @@ def meetings(request):
             meeting.save()
             data = {}
             data['error'] = False
-            data['error_msg'] = 'Meeting Saved!!'
+            data['success_msg'] = 'Meeting Saved!!'
+            data['meetings'] = serializers.serialize("json", [Meetings.objects.filter(user_id=user_id).first()])
+            data['meetings'] = json.loads(data['meetings'])
             return JsonResponse(data) 
         else:
             data = {}
