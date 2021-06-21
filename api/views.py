@@ -81,6 +81,7 @@ def update_profile(request):
         user_id = request.POST['user_id']
         name = request.POST['name']
         profession = request.POST['profession']
+        address = request.POST['address']
         phone_no = request.POST['phone_no']
         image = request.POST['image']
         # images = base64_to_image(image)
@@ -100,6 +101,7 @@ def update_profile(request):
                 update.name=name
                 update.profession=profession
                 update.phone_no=phone_no
+                update.address=address
                 if image != "":
                     images = base64_to_image(image)    
                     update.image=images
@@ -147,14 +149,19 @@ def login(request):
             user = Users.objects.get(email=email)
             user_password = user.password
             if password == user_password:
-                p = Users.objects.all()
+                # p = Users.objects.all()
+                # Social_links.objects.all()
                 data = {}
                 data['error'] = 'False'
                 data['success_msg'] = 'Successfully login!!'
                 data['users'] = serializers.serialize("json", [Users.objects.get(id=user.pk)])
                 data['users'] = json.loads(data['users'])
-                # S = social_links.Social_links.objects.all()
-                # print(S)
+                data['links'] = serializers.serialize("json", [Social_links.objects.get(user_id=user.pk)])
+                data['links'] = json.loads(data['links'])
+                user_meetings = Meetings.objects.filter(user_id=user.pk)
+                linkss = serializers.serialize('json',user_meetings)
+                data["meetings"] = json.loads(linkss)
+                print(data)
                 return JsonResponse(data)
 
                 # print("yes")
@@ -205,9 +212,12 @@ def meetings(request):
             data = {}
             data['error'] = False
             data['success_msg'] = 'Meeting Saved!!'
-            data['meetings'] = serializers.serialize("json", [Meetings.objects.filter(user_id=user_id).first()])
-            data['meetings'] = json.loads(data['meetings'])
-            return JsonResponse(data) 
+            # data['meetings'] = serializers.serialize("json", [Meetings.objects.filter(user_id=user_id).first()])
+            # data['meetings'] = json.loads(data['meetings'])
+            user_meetings = Meetings.objects.filter(user_id=user_id)
+            linkss = serializers.serialize('json',user_meetings)
+            data["meetings"] = json.loads(linkss)
+            return JsonResponse(data)
         else:
             data = {}
             data['error'] = True
@@ -245,7 +255,9 @@ def social_links(request):
             # print(links)
             data = {}
             data['error'] = False
-            data['error_msg'] = 'Social Links Saved!!'
+            data['success_msg'] = 'Social Links Saved!!'
+            data['links'] = serializers.serialize("json", [Social_links.objects.get(user_id=user_id)])
+            data['links'] = json.loads(data['links'])
             return JsonResponse(data) 
         else:
             data = {}
