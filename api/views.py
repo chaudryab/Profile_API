@@ -50,7 +50,7 @@ def users(request):
             return JsonResponse(data)
 
         else:
-            user = Users(name=name, email=email, password=password, profession=profession, phone_no="",address="", image=images)
+            user = Users(name=name, email=email, password=password, profession="", phone_no="",address="", image="")
             user.save()
             social = Social_links(user_id=user.pk)
             social.save()
