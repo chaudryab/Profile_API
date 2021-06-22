@@ -1,5 +1,7 @@
-from django.urls import path
-
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
@@ -9,5 +11,6 @@ urlpatterns = [
     path('links', views.social_links, name='links'),
     path('update_profile', views.update_profile, name='update_profile'),
     path('change_password', views.change_password, name='change_password'),
+    path('admin_login', views.admin_login, name='admin_login'),
 
 ]
