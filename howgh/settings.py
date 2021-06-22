@@ -275,14 +275,14 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
 MEDIA_URL = '/images/'
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# CLOUDINARY_STORAGE = {
-#   'CLOUD_NAME' : "chaudryab", 
-#   'API_KEY' : "255787541522233", 
-#   'API_SECRET' : "iM5--uaTDgLHcJy4mHgVp9VRPpE" 
-# } 
+CLOUDINARY_STORAGE = {
+  'CLOUD_NAME' : "chaudryab", 
+  'API_KEY' : "255787541522233", 
+  'API_SECRET' : "iM5--uaTDgLHcJy4mHgVp9VRPpE" 
+} 
 
 
 # Default primary key field type
