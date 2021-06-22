@@ -223,12 +223,7 @@ def meetings(request):
             data['error'] = True
             data['error_msg'] = 'User Not Found!!'
             return JsonResponse(data)
-
-        
-            
-       
-
-        
+    
     else:
         data = {}
         data['error'] = True
@@ -265,6 +260,51 @@ def social_links(request):
             data['error_msg'] = 'User Not Found!!'
             return JsonResponse(data)
         
+    else:
+        data = {}
+        data['error'] = True
+        data['error_msg'] = 'Method not supported'
+        return JsonResponse(data)
+
+@csrf_exempt
+def change_password(request):
+    if request.method == "POST":
+        user_id = request.POST['user_id']
+        old_password = request.POST['old_password']
+        new_password = request.POST['new_password']
+
+        if Users.objects.filter(id=user_id).exists():
+            user = Users.objects.get(id=user_id)
+            if user.password == old_password:
+                if new_password != new_password.strip():
+                    data = {}
+                    data['error'] = 'True'
+                    data['error_msg'] = 'Password field is required'
+                    return JsonResponse(data)
+                elif int(len(new_password)) < 6:
+                    data = {}
+                    data['error'] = 'True'
+                    data['error_msg'] = 'Password must be contain 6 characters!!'
+                    return JsonResponse(data)
+                else:
+                    user.password=new_password
+                    user.save()
+                    data = {}
+                    data['error'] = False
+                    data['success_msg'] = 'Password Changed'
+                    return JsonResponse(data)
+            else:
+                data = {}
+                data['error'] = True
+                data['error_msg'] = 'Old Password Not Match!!!'
+                return JsonResponse(data)
+            
+        else:
+            data = {}
+            data['error'] = True
+            data['error_msg'] = 'User Not Found!!!'
+            return JsonResponse(data)
+    
     else:
         data = {}
         data['error'] = True
