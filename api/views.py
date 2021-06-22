@@ -315,4 +315,44 @@ def change_password(request):
 
 
     
+@csrf_exempt
+def admin_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
 
+        user = auth.authenticate(username=username, password=password)
+        if user:
+
+            if user.is_superuser:
+                auth.login(request, user)
+                # return HttpResponse("ADMIN PAGE!!")
+                return redirect('index')
+
+        else:
+            messages.info(request, 'Invalid Crendentials')
+            return redirect('admin_login')
+
+    else:
+        return render(request, 'login.html')
+        # return HttpResponse("cvghdvcua")
+
+@login_required
+def index(request):
+    return render(request, 'index.html')
+
+@login_required
+def customers(request):
+    data = Users.objects.all()
+    cus = {"username": data}
+
+    return render(request, 'users.html',cus)
+
+@login_required
+def c_meetings(request):
+    return render(request, 'meetings.html')
+
+@login_required
+def logout(request):
+    auth.logout(request)
+    return redirect('admin_login')

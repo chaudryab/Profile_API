@@ -1,0 +1,95 @@
+{% extends 'includes/master.html' %}
+
+
+
+
+{% block body %}
+{% load static %}
+
+
+                            <ul class="list-inline menu-left mb-0">
+                                <li class="list-inline-item">
+                                    <button type="button" class="button-menu-mobile open-left waves-effect">
+                                        <i class="ion-navicon"></i>
+                                    </button>
+                                </li>
+                                <li class="hide-phone list-inline-item app-search">
+                                    <h3 class="page-title">Users</h3>
+                                </li>
+                            </ul>
+
+                            <div class="clearfix"></div>
+                        </nav>
+
+                    </div>
+
+
+
+
+
+                    <div class="page-content-wrapper">
+
+                        <div class="container-fluid">
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card m-b-30">
+                                        <div class="card-body">
+                                                                                        
+                                            <table id="datatable" class="table table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                                <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>E-mail</th>
+                                                    <th>Phone No</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                                </thead>
+            
+            
+                                                <tbody>
+                                                    {% for user in username %}
+                                                    <tr>
+                                                        <td>{{ user.name}}</td>
+                                                        <td>{{ user.email}}</td>
+                                                        <td>{{ user.phone_no}}</td>
+                                                        <td class="text-center "> 
+                                                            <a href="#" class="btn btn-outline-danger waves-effect waves-light"><i class="fa fa-user-times fa-md" ></i></a>
+                                                            &nbsp
+                                                            <a href="#" class="btn btn-outline-primary waves-effect waves-light"><i class="mdi mdi-account-card-details" ></i></a>
+                                                        </td>
+                                                      
+
+                                                    </tr>
+                                                    {% endfor %}
+                                            </table>
+            
+                                        </div>
+                                    </div>
+                                </div> <!-- end col -->
+                            </div> <!-- end row -->
+                        </div><!-- container -->
+                    </div>
+                </div>
+                {% endblock %}
+                {% block js %}
+
+
+    <script src="{% static '/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static '/plugins/datatables/dataTables.bootstrap4.min.js' %}"></script>
+    <!-- Buttons examples -->
+    <script src="{% static '/plugins/datatables/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static '/plugins/datatables/buttons.bootstrap4.min.js' %}"></script>
+    <script src="{% static '/plugins/datatables/jszip.min.js' %}"></script>
+    <script src="{% static '/plugins/datatables/pdfmake.min.js' %}"></script>
+    <script src="{% static '/plugins/datatables/vfs_fonts.js' %}"></script>
+    <script src="{% static '/plugins/datatables/buttons.html5.min.js' %}"></script>
+    <script src="{% static '/plugins/datatables/buttons.print.min.js' %}"></script>
+    <script src="{% static '/plugins/datatables/buttons.colVis.min.js' %}"></script>
+    <!-- Responsive examples -->
+    <script src="{% static '/plugins/datatables/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static '/plugins/datatables/responsive.bootstrap4.min.js' %}"></script>
+
+    <!-- Datatable init js -->
+    <script src="{% static '/pages/datatables.init.js' %}"></script>
+    {% endblock %}
