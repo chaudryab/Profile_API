@@ -12,5 +12,7 @@ urlpatterns = [
     path('update_profile', views.update_profile, name='update_profile'),
     path('change_password', views.change_password, name='change_password'),
     path('admin_login', views.admin_login, name='admin_login'),
+    path("index/", views.index, name="index"),
+
 
 ]

@@ -10,6 +10,7 @@ import json
 import base64
 from django.core.files.base import ContentFile
 from uuid import uuid4
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 @csrf_exempt
 def users(request):
@@ -325,13 +326,8 @@ def admin_login(request):
 
             if user.is_superuser:
                 auth.login(request, user)
-                return HttpResponse("ADMIN PAGE!!")
-                # return render(request, 'admin.html')
-
-            auth.login(request, user)
-            return HttpResponse("USER PAGE!!")
-
-            # return redirect('/shop')
+                # return HttpResponse("ADMIN PAGE!!")
+                return render(request, 'index.html')
 
         else:
             messages.info(request, 'Invalid Crendentials')
@@ -339,3 +335,7 @@ def admin_login(request):
 
     else:
         return render(request, 'login.html')
+
+@login_required
+def index(request):
+            return render(request, 'index.html')
