@@ -94,20 +94,20 @@ WSGI_APPLICATION = 'howgh.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'howgh',
-        'USER': 'abdullah',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'howgh',
+        # 'USER': 'abdullah',
+        # 'PASSWORD': '',
+        # 'HOST': 'localhost',
+        # 'PORT': '3306',
         
 
-        # 'ENGINE': 'django.db.backends.postgresql',
-        # 'NAME': 'da3p63l4399dlo',
-        # 'USER': 'dqporglchvkxqo',
-        # 'PASSWORD': '8d8393b08e8f6ba45272a42d27950017dc5e0918883cb4491988bb7c6f8590ab',
-        # 'HOST': 'ec2-54-90-211-192.compute-1.amazonaws.com',
-        # 'PORT': '5432'
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'da3p63l4399dlo',
+        'USER': 'dqporglchvkxqo',
+        'PASSWORD': '8d8393b08e8f6ba45272a42d27950017dc5e0918883cb4491988bb7c6f8590ab',
+        'HOST': 'ec2-54-90-211-192.compute-1.amazonaws.com',
+        'PORT': '5432'
         # postgres://dqporglchvkxqo:8d8393b08e8f6ba45272a42d27950017dc5e0918883cb4491988bb7c6f8590ab@ec2-54-90-211-192.compute-1.amazonaws.com:5432/da3p63l4399dlo
         
         # 'ENGINE': 'django.db.backends.sqlite3',
