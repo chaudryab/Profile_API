@@ -11,11 +11,13 @@ import base64
 from django.core.files.base import ContentFile
 from uuid import uuid4
 from django.contrib.auth.decorators import login_required
+
 # Create your views here.
+
+#------------- User Create --------------
 @csrf_exempt
 def users(request):
     if request.method == "POST":
-    
         name = request.POST['name']
         email = request.POST['email']
         password = request.POST['password']
@@ -23,31 +25,31 @@ def users(request):
         if Users.objects.filter(email=email).exists():
 
             data = {}
-            data['error'] = 'True'
+            data['error'] = True
             data['error_msg'] = 'Email Already Exists!!'
             return JsonResponse(data)
 
         elif int(len(password)) < 6:
             data = {}
-            data['error'] = 'True'
+            data['error'] = True
             data['error_msg'] = 'Password must be contain 6 characters!!'
             return JsonResponse(data)
         
         elif name != name.strip():
             data = {}
-            data['error'] = 'True'
+            data['error'] = True
             data['error_msg'] = 'Name field is required'
             return JsonResponse(data)
         
         elif email != email.strip():
             data = {}
-            data['error'] = 'True'
+            data['error'] = True
             data['error_msg'] = 'Email field is required'
             return JsonResponse(data)
         
         elif password != password.strip():
             data = {}
-            data['error'] = 'True'
+            data['error'] = True
             data['error_msg'] = 'Password field is required'
             return JsonResponse(data)
 
@@ -55,21 +57,13 @@ def users(request):
             user = Users(name=name, email=email, password=password)
             user.save()
             social = Social_links(user_id=user.pk)
-            social.save()
-            # user = Users.objects.get(id=user.pk)
-        
+            social.save()        
             data = {}
             data['error'] = 'False'
             data['success_msg'] = 'User created successfully'
             # data['users'] = serializers.serialize("json", [Users.objects.get(id=user.pk)])
             # data['users'] = json.loads(data['users'])
             return JsonResponse(data)
-        
-            # return HttpResponse(json.dumps(response), content_type="application/json")
-            # return JsonResponse(json.dumps(data), content_type="application/json")
-            # return JsonResponse(data)
-        
- 
     else:
         data = {}
         data['error'] = True
@@ -77,6 +71,7 @@ def users(request):
         return JsonResponse(data)
         
 
+#------------- User Profile Update --------------
 @csrf_exempt
 def update_profile(request):
     if request.method == "POST":
@@ -86,19 +81,14 @@ def update_profile(request):
         address = request.POST['address']
         phone_no = request.POST['phone_no']
         image = request.POST['image']
-        # images = base64_to_image(image)
-
 
         if Users.objects.filter(id=user_id).exists():
             update = Users.objects.get(id=user_id)
-
-            
             if name != name.strip():
                 data = {}
-                data['error'] = 'True'
+                data['error'] = True
                 data['error_msg'] = 'Name field is required'
                 return JsonResponse(data)
-
             else:
                 update.name=name
                 update.profession=profession
@@ -107,25 +97,18 @@ def update_profile(request):
                 if image != "":
                     images = base64_to_image(image)    
                     update.image=images
-                update.save()
-                # user = Users.objects.get(id=user.pk)
-            
+                update.save()            
                 data = {}
-                data['error'] = 'False'
+                data['error'] = False
                 data['success_msg'] = 'Update successfully'
                 data['users'] = serializers.serialize("json", [Users.objects.get(id=update.pk)])
                 data['users'] = json.loads(data['users'])
                 return JsonResponse(data)
-            
-                # return HttpResponse(json.dumps(response), content_type="application/json")
-                # return JsonResponse(json.dumps(data), content_type="application/json")
-                # return JsonResponse(data)
         else:
             data = {}
             data['error'] = 'True'
             data['error_msg'] = 'User Does Not Exists!!'
             return JsonResponse(data)    
- 
     else:
         data = {}
         data['error'] = True
@@ -138,23 +121,19 @@ def base64_to_image(base64_string):
     return ContentFile(base64.b64decode(imgstr), name=uuid4().hex + "." + ext)
 
 
-
-
+#------------- User LogIn --------------
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
-        # pass = Users.objects.get(password=user.pk)
 
         if Users.objects.filter(email=email).exists():
             user = Users.objects.get(email=email)
             user_password = user.password
             if password == user_password:
-                # p = Users.objects.all()
-                # Social_links.objects.all()
                 data = {}
-                data['error'] = 'False'
+                data['error'] = False
                 data['success_msg'] = 'Successfully login!!'
                 data['users'] = serializers.serialize("json", [Users.objects.get(id=user.pk)])
                 data['users'] = json.loads(data['users'])
@@ -163,22 +142,15 @@ def login(request):
                 user_meetings = Meetings.objects.filter(user_id=user.pk)
                 linkss = serializers.serialize('json',user_meetings)
                 data["meetings"] = json.loads(linkss)
-                print(data)
                 return JsonResponse(data)
-
-                # print("yes")
-                # data = {}
-                # data['error'] = 'False'
-                # data['error_msg'] = 'Password Match!!'
-                # return JsonResponse(data)
             else:
                 data = {}
-                data['error'] = 'True'
+                data['error'] = True
                 data['error_msg'] = 'Password Not Match!!'
                 return JsonResponse(data)  
         else:
             data = {}
-            data['error'] = 'True'
+            data['error'] = True
             data['error_msg'] = 'Email Not Found!!'
             return JsonResponse(data)
     else:
@@ -187,6 +159,8 @@ def login(request):
         data['error_msg'] = 'Method not supported'
         return JsonResponse(data)
 
+
+#------------- User Meetings --------------
 @csrf_exempt
 def meetings(request):
     if request.method == 'POST':
@@ -198,8 +172,6 @@ def meetings(request):
             data = {}
             data['error'] = False
             data['success_msg'] = 'Meeting Saved!!'
-            # data['meetings'] = serializers.serialize("json", [Meetings.objects.filter(user_id=user_id).first()])
-            # data['meetings'] = json.loads(data['meetings'])
             user_meetings = Meetings.objects.filter(user_id=user_id)
             linkss = serializers.serialize('json',user_meetings)
             data["meetings"] = json.loads(linkss)
@@ -209,14 +181,14 @@ def meetings(request):
             data['error'] = True
             data['error_msg'] = 'User Not Found!!'
             return JsonResponse(data)
-    
     else:
         data = {}
         data['error'] = True
         data['error_msg'] = 'Method not supported'
         return JsonResponse(data)
 
-    
+
+#------------- User Social Links --------------
 @csrf_exempt
 def social_links(request):
     if request.method == 'POST':
@@ -233,7 +205,6 @@ def social_links(request):
             links.linkedin=linkedin
             links.youtube=youtube
             links.save()
-            # print(links)
             data = {}
             data['error'] = False
             data['success_msg'] = 'Social Links Saved!!'
@@ -245,13 +216,14 @@ def social_links(request):
             data['error'] = True
             data['error_msg'] = 'User Not Found!!'
             return JsonResponse(data)
-        
     else:
         data = {}
         data['error'] = True
         data['error_msg'] = 'Method not supported'
         return JsonResponse(data)
 
+
+#------------- User Password Change in Profile --------------
 @csrf_exempt
 def change_password(request):
     if request.method == "POST":
@@ -264,12 +236,12 @@ def change_password(request):
             if user.password == old_password:
                 if new_password != new_password.strip():
                     data = {}
-                    data['error'] = 'True'
+                    data['error'] = True
                     data['error_msg'] = 'Password field is required'
                     return JsonResponse(data)
                 elif int(len(new_password)) < 6:
                     data = {}
-                    data['error'] = 'True'
+                    data['error'] = True
                     data['error_msg'] = 'Password must be contain 6 characters!!'
                     return JsonResponse(data)
                 else:
@@ -284,13 +256,11 @@ def change_password(request):
                 data['error'] = True
                 data['error_msg'] = 'Old Password Not Match!!!'
                 return JsonResponse(data)
-            
         else:
             data = {}
             data['error'] = True
             data['error_msg'] = 'User Not Found!!!'
             return JsonResponse(data)
-    
     else:
         data = {}
         data['error'] = True
@@ -298,7 +268,7 @@ def change_password(request):
         return JsonResponse(data)
 
 
-    
+#------------- Admin LogIn --------------
 @csrf_exempt
 def admin_login(request):
     if request.method == 'POST':
@@ -310,46 +280,52 @@ def admin_login(request):
 
             if user.is_superuser:
                 auth.login(request, user)
-                # return HttpResponse("ADMIN PAGE!!")
                 return redirect('index')
-
         else:
             messages.info(request, 'Invalid Crendentials')
             return redirect('admin_login')
-
     else:
         return render(request, 'login.html')
-        # return HttpResponse("cvghdvcua")
 
+
+#------------- Reterive Dashboard In Admin Panel --------------
 @login_required
 def index(request):
     return render(request, 'index.html')
 
+
+#------------- Reterive All Users In Admin Panel --------------
 @login_required
 def customers(request):
     data = Users.objects.all()
     cus = {"username": data}
-
     return render(request, 'users.html',cus)
 
+
+#------------- Reterive ##### In Admin Panel --------------
 @login_required
 def c_meetings(request):
     return render(request, 'meetings.html')
 
+
+#------------- Admin Logout --------------
 @login_required
 def logout(request):
     auth.logout(request)
     return redirect('admin_login')
 
+
+#------------- Reterive Specific User Detail In Admin Panel --------------
 @login_required
 def user_detail(request,pk):
     data = Users.objects.filter(id=pk)
-    # cus_detail = {"user_detail": data}
     data1 = Meetings.objects.filter(user_id=pk)
     data2 = Social_links.objects.filter(user_id=pk)
     cus_detail = {"user_detail": data,"user_meetings": data1,"user_socialLinks": data2}
     return render(request, 'user_detail.html', cus_detail)
 
+
+#------------- Delete Specific User In Admin Panel --------------
 @login_required
 def user_delete(request, pk):
     instance_user = Users.objects.filter(id=pk)
@@ -358,4 +334,5 @@ def user_delete(request, pk):
     instance_links.delete()
     instance_meetings = Meetings.objects.filter(user_id=pk)
     instance_meetings.delete()
-    return render(request, 'users.html')
+    return redirect('customers')
+

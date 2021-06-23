@@ -47,30 +47,38 @@ PAGE CONTENT START
 
                 <div class="row text-center m-t-20">
                     <div class="col-6">
-                        <h5 class="mb-0">235</h5>
-                        <p class="text-muted font-14">Activated</p>
+                        <h6 class="mb-0">{{ user.phone_no }}</h6>
+                        <p class="text-muted font-14">Phone Number</p>
                     </div>
                     <div class="col-6">
-                        <h5 class="mb-0">9512</h5>
-                        <p class="text-muted font-14">Activated</p>
+                        <h6 class="mb-0">{{ user.address }}</h6>
+                        <p class="text-muted font-14">Address</p>
                     </div>
                 </div>
                 {% endfor %}
 
                 {% for user in user_socialLinks %}
                 <ul class="social-links text-center list-inline mb-0 mt-3">
+                    {% if user.fb != '' %}
                     <li class="list-inline-item">
                         <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href=" {{ user.fb }} " data-original-title="Facebook"><i class="fa fa-facebook"></i></a>
                     </li>
+                    {% endif %}
+                    {% if user.insta != '' %}
                     <li class="list-inline-item">
                         <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href=" {{ user.insta }}" data-original-title="Instagram"><i class="fa fa-instagram"></i></a>
                     </li>
+                    {% endif %}
+                    {% if user.linkedin != '' %}
                     <li class="list-inline-item">
                         <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href=" {{ user.linkedin }} " data-original-title="LinkedIn"><i class="fa fa-linkedin"></i></a>
                     </li>
+                    {% endif %}
+                    {% if user.youtube != '' %}
                     <li class="list-inline-item">
                         <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href=" {{ user.youtube }} " data-original-title="Youtube"><i class="fa fa-youtube"></i></a>
                     </li>
+                    {% endif %}
                 </ul>
                 {% endfor %}
             </div>

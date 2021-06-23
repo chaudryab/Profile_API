@@ -18,6 +18,4 @@ urlpatterns = [
     path('c_meetings', views.c_meetings, name='c_meetings'),
     path('user_detail/<pk>', views.user_detail, name='user_detail'),
     path('user_delete/<pk>', views.user_delete, name='user_delete'),
-
-
 ]
