@@ -1,6 +1,7 @@
 from django.db import models
 
 
+
 # Create your models here.
 class Users(models.Model):
     # social_links = models.OneToOneField("Social_links",on_delete=models.CASCADE,default=1)

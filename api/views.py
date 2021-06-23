@@ -181,22 +181,6 @@ def login(request):
             data['error'] = 'True'
             data['error_msg'] = 'Email Not Found!!'
             return JsonResponse(data)
-
-
-        # user = auth.authenticate(email=username, password=password)
-        # if user:
-
-        #     if user.is_superuser:
-        #         auth.login(request, user)
-        #         return redirect('/shop/adminn')
-
-        #     auth.login(request, user)
-        #     return redirect('/shop')
-
-        # else:
-        #     messages.info(request, 'Invalid Crendentials')
-        #     return redirect('/accounts/login')
-
     else:
         data = {}
         data['error'] = True
@@ -356,3 +340,14 @@ def c_meetings(request):
 def logout(request):
     auth.logout(request)
     return redirect('admin_login')
+
+@login_required
+def user_detail(request):
+    return render(request, 'user_detail.html')
+
+@login_required
+def user_delete(request, pk):
+    instance = Users.objects.get(id=pk)
+    instance.delete()
+    # MyModel.objects.filter(pk=1).delete()
+    return render(request, 'users.html')
