@@ -52,7 +52,7 @@ def users(request):
             return JsonResponse(data)
 
         else:
-            user = Users(name=name, email=email, password=password, profession="", phone_no="",address="", image="")
+            user = Users(name=name, email=email, password=password)
             user.save()
             social = Social_links(user_id=user.pk)
             social.save()
@@ -342,12 +342,20 @@ def logout(request):
     return redirect('admin_login')
 
 @login_required
-def user_detail(request):
-    return render(request, 'user_detail.html')
+def user_detail(request,pk):
+    data = Users.objects.filter(id=pk)
+    # cus_detail = {"user_detail": data}
+    data1 = Meetings.objects.filter(user_id=pk)
+    data2 = Social_links.objects.filter(user_id=pk)
+    cus_detail = {"user_detail": data,"user_meetings": data1,"user_socialLinks": data2}
+    return render(request, 'user_detail.html', cus_detail)
 
 @login_required
 def user_delete(request, pk):
-    instance = Users.objects.get(id=pk)
-    instance.delete()
-    # MyModel.objects.filter(pk=1).delete()
+    instance_user = Users.objects.filter(id=pk)
+    instance_user.delete()
+    instance_links = Social_links.objects.filter(user_id=pk)
+    instance_links.delete()
+    instance_meetings = Meetings.objects.filter(user_id=pk)
+    instance_meetings.delete()
     return render(request, 'users.html')

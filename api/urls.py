@@ -16,7 +16,7 @@ urlpatterns = [
     path("index", views.index, name="index"),
     path("customers", views.customers, name="customers"),
     path('c_meetings', views.c_meetings, name='c_meetings'),
-    path('user_detail', views.user_detail, name='user_detail'),
+    path('user_detail/<pk>', views.user_detail, name='user_detail'),
     path('user_delete/<pk>', views.user_delete, name='user_delete'),
 
 

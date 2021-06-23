@@ -11,7 +11,7 @@ class Users(models.Model):
     profession = models.CharField(max_length=200, null=True)
     phone_no = models.CharField(max_length=30, null=True)
     address = models.CharField(max_length=100, null=True)
-    image = models.ImageField(upload_to='profile/', blank=True)
+    image = models.ImageField(default='profile/default_pic.png',upload_to='profile/', null=True)
     # created_at = models.DateTimeField()
     # updated_at = models.DateTimeField()
 

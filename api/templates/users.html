@@ -50,7 +50,7 @@
                                                         <td>{{ user.email}}</td>
                                                         <td>{{ user.phone_no}}</td>
                                                         <td class="text-center "> 
-                                                            <a href="{% url 'user_detail' %}"  class="btn btn-outline-primary waves-effect waves-light"><i class="mdi mdi-account-card-details" ></i></a>
+                                                            <a href="{% url 'user_detail' pk=user.id %}"  class="btn btn-outline-primary waves-effect waves-light"><i class="mdi mdi-account-card-details" ></i></a>
                                                             &nbsp
                                                             <a href="{% url 'user_delete' pk=user.id %}" value="{{user.id}}"  class="btn btn-outline-danger waves-effect waves-light"><i class="fa fa-user-times fa-md" ></i></a>
                                                         </td>

@@ -1,7 +1,8 @@
 {% extends 'includes/master.html' %}
-<link href="assets/plugins/nestable/jquery.nestable.css" rel="stylesheet" />
-{% block body %}
 {% load static %}
+
+<link href="{% static '/plugins/nestable/jquery.nestable.css' %}" rel="stylesheet" />
+{% block body %}
 
 
 
@@ -34,13 +35,13 @@ PAGE CONTENT START
     <div class="col-lg">
         <div class="card m-b-20">
             <div class="card-body">
-
+                {% for user in user_detail %}
                 <div class="media">
-                    <img class="d-flex mr-3 rounded-circle thumb-lg" src="{% static '/images/users/avatar-2.jpg' %}" alt="Generic placeholder image">
+                    <img class="d-flex mr-3 rounded-circle thumb-lg" src="{{ user.image.url }} " alt="Generic placeholder image">
                     <div class="media-body">
-                        <h5 class="m-t-10 font-18 mb-1">Herbert C. Patton</h5>
-                        <p class="text-muted m-b-5">pauline@admiria.com</p>
-                        <p class="text-muted font-14 font-500 font-secondary">Creative Director</p>
+                        <h5 class="m-t-10 font-18 mb-1">{{ user.name }}</h5>
+                        <p class="text-muted m-b-5">{{ user.email }}</p>
+                        <p class="text-muted font-14 font-500 font-secondary">{{ user.profession}}</p>
                     </div>
                 </div>
 
@@ -54,22 +55,24 @@ PAGE CONTENT START
                         <p class="text-muted font-14">Activated</p>
                     </div>
                 </div>
+                {% endfor %}
 
+                {% for user in user_socialLinks %}
                 <ul class="social-links text-center list-inline mb-0 mt-3">
                     <li class="list-inline-item">
-                        <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href="" data-original-title="Facebook"><i class="fa fa-facebook"></i></a>
+                        <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href=" {{ user.fb }} " data-original-title="Facebook"><i class="fa fa-facebook"></i></a>
                     </li>
                     <li class="list-inline-item">
-                        <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href="" data-original-title="Twitter"><i class="fa fa-twitter"></i></a>
+                        <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href=" {{ user.insta }}" data-original-title="Instagram"><i class="fa fa-instagram"></i></a>
                     </li>
                     <li class="list-inline-item">
-                        <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href="" data-original-title="1234567890"><i class="fa fa-phone"></i></a>
+                        <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href=" {{ user.linkedin }} " data-original-title="LinkedIn"><i class="fa fa-linkedin"></i></a>
                     </li>
                     <li class="list-inline-item">
-                        <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href="" data-original-title="@skypename"><i class="fa fa-skype"></i></a>
+                        <a title="" data-placement="top" data-toggle="tooltip" class="tooltips" href=" {{ user.youtube }} " data-original-title="Youtube"><i class="fa fa-youtube"></i></a>
                     </li>
                 </ul>
-
+                {% endfor %}
             </div>
         </div>
     </div> <!-- end col -->
@@ -83,20 +86,16 @@ PAGE CONTENT START
                 <h4 class="mt-0 header-title">Meetings</h4>
 
                 <div class="custom-dd dd" id="nestable_list_1">
+                    {% for user in user_meetings %}
                     <ol class="dd-list">
                         <li class="dd-item" data-id="1">
                             <div class="dd-handle">
-                                Item 1
+                                {{ user.link }}
                             </div>
-                        </li>
-                        
-                                    </ol>
-                                </li>
-                               
-                            </ol>
-                        </li>
+                        </li>  
 
                     </ol>
+                    {% endfor %} 
                 </div>
 
             </div>
@@ -110,6 +109,6 @@ PAGE CONTENT START
 
 {% endblock %}
 {% block js %}
-<script src="assets/plugins/nestable/jquery.nestable.js"></script>
-<script src="assets/pages/nestable-init.js"></script>
+<script src="{% static '/plugins/nestable/jquery.nestable.js' %}"></script>
+<script src="{% static '/pages/nestable-init.js' %}"></script>
 {% endblock %}
