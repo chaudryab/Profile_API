@@ -12,6 +12,9 @@ from django.core.files.base import ContentFile
 from uuid import uuid4
 from django.contrib.auth.decorators import login_required
 
+from uuid import uuid4
+from .helpers import send_forget_password_mail
+
 # Create your views here.
 
 #------------- User Create --------------
@@ -335,4 +338,79 @@ def user_delete(request, pk):
     instance_meetings = Meetings.objects.filter(user_id=pk)
     instance_meetings.delete()
     return redirect('customers')
+
+
+#------------------------------------------------------------------------------------------
+
+from django.contrib.auth.hashers import check_password, make_password
+def change_password(request, token):
+    if request.method == 'GET':
+        user = Users.objects.get(forget_password_token = token)
+        if user is None:
+            return render(request, 'api/Forgotten_psw.html', {'token': token, 'user_id': user.id})
+        else:
+            print('HTTP/1.1 404 Not Found\r\n')
+            print('Content-Type: text/html\r\n\r\n')
+            print('<html><head></head><body><h1>404 Not Found</h1></body></html>')    
+
+    context = {}
+    if request.method == 'POST':
+        user = Users.objects.get(forget_password_token = token)
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+        user_id = request.POST['user_id']
+        if user_id is None:
+            data = {}
+            data['error'] = True
+            data['error_msg'] = 'No user id found'
+            return JsonResponse(data)
+        if password != confirm_password:
+            data = {}
+            data['error'] = True
+            data['error_msg'] = 'password should be same'
+            return JsonResponse(data)
+        
+        userrr = Users.objects.get(id = user_id)
+        pwd = make_password(password, None, 'md5')
+        userrr.password = pwd
+        # print(userrr.forget_password_token)
+        userrr.forget_password_token = ''
+        # print(userrr.forget_password_token + '/////////')
+        userrr.save()
+        
+        data = {}
+        data['error'] = False
+        data['success_msg'] = 'New Password saved!'
+        return JsonResponse(data)
+                
+  
+
+    context = {'user_id': user.id}
+    return render(request, 'api/Forgotten_pswd.html', context)
+
+
+import uuid
+from django.core.mail import send_mail
+
+@csrf_exempt
+def forget_password(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        if not Users.objects.filter(email=email).first():
+            data = {}
+            data['error'] = True
+            data['error_msg'] = 'User not found with this email'
+            return JsonResponse(data)
+        user_obj = Users.objects.filter(email=email).first()
+        email = user_obj.email
+        token = str(uuid.uuid4())
+        user_obj.forget_password_token = token
+        user_obj.save()
+        send_forget_password_mail(email, token)
+        data = {}
+        data['error'] = False
+        data['success_msg'] = 'email sent!'
+        return JsonResponse(data)    
+    else:
+        return HttpResponse('Forgot Password Not Supported')
 
