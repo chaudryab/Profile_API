@@ -18,7 +18,7 @@ urlpatterns = [
     path('c_meetings', views.c_meetings, name='c_meetings'),
     path('user_detail/<pk>', views.user_detail, name='user_detail'),
     path('user_delete/<pk>', views.user_delete, name='user_delete'),
-    path('change_password/<str:token>', views.change_password, name='change_password'),
-    path('forget_password>', views.forget_password, name='forget_password'),
+    # path('change_password/<str:token>', views.change_password, name='change_password'),
+    # path('forget_password>', views.forget_password, name='forget_password'),
 
 ]
