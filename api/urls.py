@@ -18,7 +18,11 @@ urlpatterns = [
     path('c_meetings', views.c_meetings, name='c_meetings'),
     path('user_detail/<pk>', views.user_detail, name='user_detail'),
     path('user_delete/<pk>', views.user_delete, name='user_delete'),
-    # path('change_password/<str:token>', views.change_password, name='change_password'),
-    # path('forget_password>', views.forget_password, name='forget_password'),
-
+    path('forget_password', views.forget_password, name='forget_password'),
+    path('forget_change_pwd/<str:token>', views.forget_change_pwd, name='forget_change_pwd'),
+    path('admin_change_pwd',views.admin_change_pwd,name='admin_change_pwd'),
+    path('admin_forget_pwd',views.admin_forget_pwd,name='admin_forget_pwd'),
+    path('admin_reset_pwd',views.admin_reset_pwd,name='admin_reset_pwd'),
+    path('success',views.success,name='success'),
+    path('myprofile',views.myprofile,name='myprofile')
 ]

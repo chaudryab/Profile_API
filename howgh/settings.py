@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
     'api',
+    'admin_portal',
 
 ]
 
@@ -111,8 +112,7 @@ DATABASES = {
         'PASSWORD': '8d8393b08e8f6ba45272a42d27950017dc5e0918883cb4491988bb7c6f8590ab',
         'HOST': 'ec2-54-90-211-192.compute-1.amazonaws.com',
         'PORT': '5432'
-        # postgres://dqporglchvkxqo:8d8393b08e8f6ba45272a42d27950017dc5e0918883cb4491988bb7c6f8590ab@ec2-54-90-211-192.compute-1.amazonaws.com:5432/da3p63l4399dlo
-        
+
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': BASE_DIR / 'db.sqlite3',
     }
@@ -180,9 +180,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'saadmb1995@gmail.com'
-# EMAIL_HOST_PASSWORD = 'ililoncqgepunhlm'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'abchaudry9@gmail.com'
+EMAIL_HOST_PASSWORD = 'cjkpejchgbukiuyv'
+
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptPasswordHasher',
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+    'django.contrib.auth.hashers.CryptPasswordHasher'
+)

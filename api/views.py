@@ -2,6 +2,7 @@ from django.http import response
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import auth
+from django.contrib.auth.models import User
 from django.contrib import messages
 from .models import Users,Meetings,Social_links
 from django.views.decorators.csrf import csrf_exempt
@@ -9,11 +10,14 @@ from django.core import serializers
 import json
 import base64
 from django.core.files.base import ContentFile
+import uuid
 from uuid import uuid4
 from django.contrib.auth.decorators import login_required
+from .helpers import send_forget_password_mail, send_admin_forget_password_mail
+from django.http import HttpResponseRedirect
+from django.contrib.auth.hashers import check_password, make_password
 
-# from uuid import uuid4
-# from .helpers import send_forget_password_mail
+
 
 # Create your views here.
 
@@ -318,6 +322,38 @@ def logout(request):
     return redirect('admin_login')
 
 
+#------------- Admin Logout --------------
+@login_required
+@csrf_exempt
+def admin_change_pwd(request):
+    superusers = User.objects.get(is_superuser=True)
+    print(superusers.password)
+
+    if request.method == 'POST':
+        old_password = request.POST['old_password']
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
+        superusers = User.objects.get(is_superuser=True)
+        if check_password(old_password,superusers.password):
+            if int(len(new_password)) < 6:
+                messages.info(request, 'Password Must Contains Six Characters!!')
+                return redirect('admin_change_pwd')
+            elif new_password == confirm_password:
+                super_pwd = make_password(new_password, None, 'md5')
+                superusers.password = super_pwd
+                superusers.save()
+                messages.info(request, 'Password Changed!!')
+                return redirect('admin_change_pwd')
+            else:
+                messages.info(request, 'Password Did Not Match!!')
+                return redirect('admin_change_pwd')
+        else:
+            messages.info(request, 'Invalid Old Password!!')
+            return redirect('admin_change_pwd')
+
+    return render(request,'admin_change_pwd.html')
+
+
 #------------- Reterive Specific User Detail In Admin Panel --------------
 @login_required
 def user_detail(request,pk):
@@ -340,20 +376,113 @@ def user_delete(request, pk):
     return redirect('customers')
 
 
+@csrf_exempt
+def admin_forget_pwd(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        superuser = User.objects.get(is_superuser=True)
+        print(superuser)
+        print(email)
+        if superuser.email == email:
+            send_admin_forget_password_mail(email)
+            messages.info(request, 'Email Send!!')
+            return redirect('admin_forget_pwd')
+        else:
+            messages.info(request, 'Email Not Exist!!')
+            return redirect('admin_forget_pwd')
+
+    return render(request,'admin_forget_pwd.html')
+
+
+#------------- Forget Password --------------
+@csrf_exempt
+def forget_password(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        if Users.objects.filter(email=email):
+            token = str(uuid.uuid4())
+            user = Users.objects.get(email=email)
+            user.forget_password_token=token
+            user.save()
+            email=user.email
+            send_forget_password_mail(email, token)
+            data = {}
+            data['error'] = False
+            data['success_msg'] = 'Email Send!!!'
+            return JsonResponse(data)
+        else:
+            data = {}
+            data['error'] = True
+            data['error_msg'] = 'Email Not Exist!!'
+            return JsonResponse(data)
+    else:
+        data = {}
+        data['error'] = True
+        data['error_msg'] = 'Method not supported'
+        return JsonResponse(data)
+
+
+@csrf_exempt
+def admin_reset_pwd(request):
+    if request.method == 'POST':
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
+        superusers = User.objects.get(is_superuser=True)
+        if int(len(new_password)) < 6:
+            messages.info(request, 'Password Must Contains Six Characters!!')
+            return redirect('admin_reset_pwd')
+        elif new_password == confirm_password:
+            super_pwd = make_password(new_password, None, 'md5')
+            superusers.password = super_pwd
+            superusers.save()
+            messages.info(request, 'Password Changed!!')
+            return redirect('admin_reset_pwd')
+        else:
+            messages.info(request, 'Password Did Not Match!!')
+            return redirect('admin_reset_pwd')
+    return render(request, 'admin_reset_pwd.html')
+
+#------------- Change Forget Password --------------
+@csrf_exempt
+def forget_change_pwd(request,token):
+    if request.method == 'GET':
+        user = Users.objects.get(forget_password_token = token)
+        return render(request, 'forget_change_pwd.html', {'token': token, 'user_id': user.id})
+    if request.method == 'POST':
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
+        user_id = request.POST['user_id']
+        if new_password != confirm_password:
+            messages.info(request, 'Password Not Match!!')
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER','/'))
+        elif int(len(new_password)) < 6:
+            messages.info(request, 'Password Must Be Contain Six Characters!!')
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER','/'))
+        else:
+            user=Users.objects.get(id=user_id)
+            print(user)
+            # pwd = make_password(new_password, None, 'md5')
+            user.password=new_password
+            user.forget_password_token=''
+            user.save()
+            data = {}
+            return redirect('success')
+
+    return render(request, 'forget_change_pwd.html')
+
+def success(request):
+    return render(request, 'success.html')
+    
+def myprofile(request):
+    return render(request,'myprofile.html')
 # #------------------------------------------------------------------------------------------
 
 # from django.contrib.auth.hashers import check_password, make_password
 # def change_password(request, token):
 #     if request.method == 'GET':
 #         user = Users.objects.get(forget_password_token = token)
-#         if user is None:
-#             return render(request, 'api/Forgotten_psw.html', {'token': token, 'user_id': user.id})
-#         else:
-#             print('HTTP/1.1 404 Not Found\r\n')
-#             print('Content-Type: text/html\r\n\r\n')
-#             print('<html><head></head><body><h1>404 Not Found</h1></body></html>')    
-
-#     context = {}
+#         return render(request, 'api/Forgotten_psw.html', {'token': token, 'user_id': user.id})
+#         
 #     if request.method == 'POST':
 #         user = Users.objects.get(forget_password_token = token)
 #         password = request.POST['password']
@@ -375,7 +504,6 @@ def user_delete(request, pk):
 #         userrr.password = pwd
 #         # print(userrr.forget_password_token)
 #         userrr.forget_password_token = ''
-#         # print(userrr.forget_password_token + '/////////')
 #         userrr.save()
         
 #         data = {}
@@ -385,11 +513,9 @@ def user_delete(request, pk):
                 
   
 
-#     context = {'user_id': user.id}
-#     return render(request, 'api/Forgotten_pswd.html', context)
+#     return render(request, 'api/Forgotten_pswd.html')
 
 
-# import uuid
 # from django.core.mail import send_mail
 
 # @csrf_exempt
