@@ -13,7 +13,7 @@ from django.core.files.base import ContentFile
 import uuid
 from uuid import uuid4
 from django.contrib.auth.decorators import login_required
-from .helpers import send_forget_password_mail, send_admin_forget_password_mail
+from .helpers import send_forget_password_mail, send_admin_forget_password_mail,send_user_change_email
 from django.http import HttpResponseRedirect
 from django.contrib.auth.hashers import check_password, make_password
 
@@ -446,8 +446,11 @@ def admin_reset_pwd(request):
 @csrf_exempt
 def forget_change_pwd(request,token):
     if request.method == 'GET':
-        user = Users.objects.get(forget_password_token = token)
-        return render(request, 'forget_change_pwd.html', {'token': token, 'user_id': user.id})
+        user = Users.objects.filter(forget_password_token = token).first()
+        if user:
+            return render(request, 'forget_change_pwd.html', {'token': token, 'user_id': user.id})
+        else:
+            return render(request,"404_error.html")
     if request.method == 'POST':
         new_password = request.POST['new_password']
         confirm_password = request.POST['confirm_password']
@@ -475,68 +478,66 @@ def success(request):
     
 def myprofile(request):
     return render(request,'myprofile.html')
-# #------------------------------------------------------------------------------------------
 
-# from django.contrib.auth.hashers import check_password, make_password
-# def change_password(request, token):
-#     if request.method == 'GET':
-#         user = Users.objects.get(forget_password_token = token)
-#         return render(request, 'api/Forgotten_psw.html', {'token': token, 'user_id': user.id})
-#         
-#     if request.method == 'POST':
-#         user = Users.objects.get(forget_password_token = token)
-#         password = request.POST['password']
-#         confirm_password = request.POST['confirm_password']
-#         user_id = request.POST['user_id']
-#         if user_id is None:
-#             data = {}
-#             data['error'] = True
-#             data['error_msg'] = 'No user id found'
-#             return JsonResponse(data)
-#         if password != confirm_password:
-#             data = {}
-#             data['error'] = True
-#             data['error_msg'] = 'password should be same'
-#             return JsonResponse(data)
+
+@csrf_exempt
+def user_send_change_email(request):
+    if request.method == "POST":
+        user_id = request.POST['user_id']
+        new_email = request.POST['new_email']
+        password = request.POST['password']
         
-#         userrr = Users.objects.get(id = user_id)
-#         pwd = make_password(password, None, 'md5')
-#         userrr.password = pwd
-#         # print(userrr.forget_password_token)
-#         userrr.forget_password_token = ''
-#         userrr.save()
-        
-#         data = {}
-#         data['error'] = False
-#         data['success_msg'] = 'New Password saved!'
-#         return JsonResponse(data)
+        if Users.objects.filter(id=user_id):
+            user = Users.objects.get(id=user_id)
+            if password == user.password:
                 
-  
+                if Users.objects.filter(email = new_email).exists():
+                    if user.email == new_email :
+                        data = {}
+                        data['error'] = True
+                        data['error_msg'] = 'Email already in your use'
+                        return JsonResponse(data)
+                    else:
+                        data = {}
+                        data['error'] = True
+                        data['error_msg'] = 'Email already exists'
+                        return JsonResponse(data)
+                else:
+                    token = str(uuid.uuid4())
+                    user.forget_password_token = token
+                    user.save()
+                    send_user_change_email(new_email, token)
+                    data = {}
+                    data['error'] = False
+                    data['success_msg'] = 'Email sent successfully'
+                    return JsonResponse(data)
+                    
+            else:
+                data = {}
+                data['error'] = True
+                data['error_msg'] = 'password not match'
+                return JsonResponse(data) 
+        else:
+            data = {}
+            data['error'] = True
+            data['error_msg'] = 'User not found'
+            return JsonResponse(data) 
+    else:
+        data = {}
+        data['error'] = True
+        data['error_msg'] = 'Method not supported'
+        return JsonResponse(data)
 
-#     return render(request, 'api/Forgotten_pswd.html')
-
-
-# from django.core.mail import send_mail
-
-# @csrf_exempt
-# def forget_password(request):
-#     if request.method == 'POST':
-#         email = request.POST['email']
-#         if not Users.objects.filter(email=email).first():
-#             data = {}
-#             data['error'] = True
-#             data['error_msg'] = 'User not found with this email'
-#             return JsonResponse(data)
-#         user_obj = Users.objects.filter(email=email).first()
-#         email = user_obj.email
-#         token = str(uuid.uuid4())
-#         user_obj.forget_password_token = token
-#         user_obj.save()
-#         send_forget_password_mail(email, token)
-#         data = {}
-#         data['error'] = False
-#         data['success_msg'] = 'email sent!'
-#         return JsonResponse(data)    
-#     else:
-#         return HttpResponse('Forgot Password Not Supported')
-
+@csrf_exempt
+def user_change_email(request, token, email):
+    if request.method == 'GET':
+        if Users.objects.filter(forget_password_token = token).exists():
+            user = Users.objects.filter(forget_password_token=token).first()
+            user.email = email
+            user.forget_password_token = ''
+            user.save()
+            return render(request, 'success_email.html',{'token': token, 'email': email})
+        else:
+            return render(request, '404_error.html')
+    else:
+        return render(request, '404_error.html')

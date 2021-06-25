@@ -20,9 +20,11 @@ urlpatterns = [
     path('user_delete/<pk>', views.user_delete, name='user_delete'),
     path('forget_password', views.forget_password, name='forget_password'),
     path('forget_change_pwd/<str:token>', views.forget_change_pwd, name='forget_change_pwd'),
+    path('user_send_change_email',views.user_send_change_email,name='user_send_change_email'),
+    path('user_change_email/<str:token>/<str:email>',views.user_change_email,name='user_change_email'),
     path('admin_change_pwd',views.admin_change_pwd,name='admin_change_pwd'),
     path('admin_forget_pwd',views.admin_forget_pwd,name='admin_forget_pwd'),
     path('admin_reset_pwd',views.admin_reset_pwd,name='admin_reset_pwd'),
     path('success',views.success,name='success'),
-    path('myprofile',views.myprofile,name='myprofile')
+    path('myprofile',views.myprofile,name='myprofile'),
 ]
