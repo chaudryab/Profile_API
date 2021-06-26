@@ -1,1 +1,1 @@
-web: gunicorn howgh.wsgi
+web: gunicorn howgh.wsgi --log-file
