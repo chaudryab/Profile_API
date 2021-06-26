@@ -13,10 +13,9 @@ from django.core.files.base import ContentFile
 import uuid
 from uuid import uuid4
 from django.contrib.auth.decorators import login_required
-from .helpers import send_forget_password_mail, send_admin_forget_password_mail,send_user_change_email
+from .helpers import send_forget_password_mail, send_admin_forget_password_mail,send_user_change_email, nfcMail
 from django.http import HttpResponseRedirect
 from django.contrib.auth.hashers import check_password, make_password
-
 
 
 # Create your views here.
@@ -322,7 +321,7 @@ def logout(request):
     return redirect('admin_login')
 
 
-#------------- Admin Logout --------------
+#------------- Admin Change Password --------------
 @login_required
 @csrf_exempt
 def admin_change_pwd(request):
@@ -376,6 +375,7 @@ def user_delete(request, pk):
     return redirect('customers')
 
 
+#------------- Admin Forget Password --------------
 @csrf_exempt
 def admin_forget_pwd(request):
     if request.method == 'POST':
@@ -394,7 +394,7 @@ def admin_forget_pwd(request):
     return render(request,'admin_forget_pwd.html')
 
 
-#------------- Forget Password --------------
+#------------- User Forget Password --------------
 @csrf_exempt
 def forget_password(request):
     if request.method == 'POST':
@@ -422,6 +422,7 @@ def forget_password(request):
         return JsonResponse(data)
 
 
+#------------- Admin Change Forget Password --------------
 @csrf_exempt
 def admin_reset_pwd(request):
     if request.method == 'POST':
@@ -442,7 +443,7 @@ def admin_reset_pwd(request):
             return redirect('admin_reset_pwd')
     return render(request, 'admin_reset_pwd.html')
 
-#------------- Change Forget Password --------------
+#------------- User Change Forget Password --------------
 @csrf_exempt
 def forget_change_pwd(request,token):
     if request.method == 'GET':
@@ -473,13 +474,41 @@ def forget_change_pwd(request,token):
 
     return render(request, 'forget_change_pwd.html')
 
+
+#------------- Succsess Message Page After Change Password --------------
 def success(request):
     return render(request, 'success.html')
-    
-def myprofile(request):
-    return render(request,'myprofile.html')
 
 
+#------------- Scan NFC User Profile Page  --------------
+def myprofile(request,id):
+    if request.method == "GET":
+        if Users.objects.filter(id=id):
+            user=Users.objects.get(id=id)
+            links=Social_links.objects.get(user_id=id)
+            return render(request,'myprofile.html', {'user':user, 'links':links})
+        else:
+            return render(request,'404_error.html')
+    else:
+        return render(request,'404_error.html')
+
+
+#------------- Send Mail To NFC User Profile Page  --------------
+@csrf_exempt
+def nfc_mail(request):
+    if request.method == "POST":
+        name = request.POST['name']
+        email = request.POST['email']
+        subject = request.POST['subject']
+        message = request.POST['message']
+        sentto = request.POST['sentto']
+        nfcMail(name,email,subject,message,sentto) 
+        return render(request,'myprofile.html')
+    else:   
+        return render(request,'myprofile.html')
+
+
+#------------- Send User Change Email  --------------
 @csrf_exempt
 def user_send_change_email(request):
     if request.method == "POST":
@@ -528,6 +557,8 @@ def user_send_change_email(request):
         data['error_msg'] = 'Method not supported'
         return JsonResponse(data)
 
+
+#------------- User Change Email  --------------
 @csrf_exempt
 def user_change_email(request, token, email):
     if request.method == 'GET':

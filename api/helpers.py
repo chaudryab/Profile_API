@@ -3,6 +3,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.template import loader
+import smtplib
 
 
 def send_forget_password_mail(email, token):
@@ -30,3 +31,12 @@ def send_admin_forget_password_mail(email):
     recipient_list = [email]
     send_mail(subject, message, email_from, recipient_list)
     return True
+
+def nfcMail(name,email,subject,message,sentto):
+    html_message = render_to_string('profile_msg.html', {'name':name,'email': email,'subject':subject,'message':message})
+    plain_message = strip_tags(html_message)
+    email_from = 'chaudryab@gmail.com'
+    recipient_list = [sentto]
+    send_mail(subject, plain_message, email_from, recipient_list, html_message=html_message)
+    return True
+  
