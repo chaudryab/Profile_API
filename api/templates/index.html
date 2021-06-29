@@ -1,8 +1,4 @@
 {% extends 'includes/master.html' %}
-
-
-
-
 {% block body %}
 {% load static %}
 
@@ -22,77 +18,70 @@
                         </nav>
 
                     </div>
+                   
 
                     <div class="page-content-wrapper">
 
                         <div class="container-fluid">
-                            
-                            <div class="row">
-                                <div class="col-md-6 col-xl-3">
-                                    <div class="card text-center m-b-30">
-                                        <div class="mb-2 card-body text-muted">
-                                            <h3 class="text-info">15,852</h3>
-                                            Monthly Statistics
+                            <div class="col-12">
+                                <div class="card m-b-30">
+                                    <div class="card-body">
+                                        <h4 class="mt-0 header-title">Registered Users Per Month</h4>
+        
+
+                                        <div class="row">
+        
+                                            <div class="col-xl-12">
+                                                <div class="card m-b-30">
+                                                    <div class="card-body">
+                                                        <!-- <h4 class="mt-0 header-title">Registered Users per month</h4> -->
+                                    
+                                                        
+                                                        <canvas id="myChart" width="400" height="200"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-3">
-                                    <div class="card text-center m-b-30">
-                                        <div class="mb-2 card-body text-muted">
-                                            <h3 class="text-purple">9,514</h3>
-                                            New Orders
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-3">
-                                    <div class="card text-center m-b-30">
-                                        <div class="mb-2 card-body text-muted">
-                                            <h3 class="text-primary">289</h3>
-                                            New Users
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-3">
-                                    <div class="card text-center m-b-30">
-                                        <div class="mb-2 card-body text-muted">
-                                            <h3 class="text-danger">5,220</h3>
-                                            Unique Visitors
-                                        </div>
+
+
+
                                     </div>
                                 </div>
                             </div>
+                            
             
                             <div class="row">
                                 <div class="col-xl-12">
                                     <div class="card m-b-30">
                                         <div class="card-body">
-                                            <h4 class="mt-0 m-b-30 header-title">Latest Transactions</h4>
+                                            <h4 class="mt-0 m-b-30 header-title">Latest Users</h4>
             
                                             <div class="table-responsive">
-                                                <table class="table m-t-20 mb-0 table-vertical">
-            
-                                                    <tbody>
+                                                <table id="datatable" class="table table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                                    <thead>
                                                     <tr>
-                                                        <td>
-                                                            <img src="{% static '/images/users/avatar-2.jpg' %}" alt="user-image" class="thumb-sm rounded-circle mr-2"/>
-                                                            Herbert C. Patton
-                                                        </td>
-                                                        <td><i class="mdi mdi-checkbox-blank-circle text-success"></i> Confirm</td>
-                                                        <td>
-                                                            $14,584
-                                                            <p class="m-0 text-muted font-14">Amount</p>
-                                                        </td>
-                                                        <td>
-                                                            5/12/2016
-                                                            <p class="m-0 text-muted font-14">Date</p>
-                                                        </td>
-                                                        <td>
-                                                            <button type="button" class="btn btn-secondary btn-sm waves-effect">Edit</button>
-                                                        </td>
+                                                        <th>Name</th>
+                                                        <th>E-mail</th>
+                                                        <th>Phone No</th>
+                                                        <th>Profession</th>
                                                     </tr>
-            
-                                                    </tbody>
+                                                    </thead>
+                
+                
+                                                    <tbody>
+                                                        {% for user in username reversed %}
+                                                        <tr>
+                                                            <td>{{ user.name}}</td>
+                                                            <td>{{ user.email}}</td>
+                                                            <td>{{ user.phone_no}}</td>
+                                                            <td>{{ user.profession }}</td>
+                                                          
+    
+                                                        </tr>
+                                                        {% endfor %}
                                                 </table>
+                
                                             </div>
                                         </div>
                                     </div>
@@ -110,6 +99,56 @@
                 {% endblock %}
                 {% block js %}
 
-    <script src="{% static '/pages/dashboard.js' %}"></script>
+                <!--Morris Chart-->
+        <script src="{% static '/plugins/morris/morris.min.js' &}"></script>
+        <script src="{% static '/plugins/raphael/raphael-min.js' &}"></script>
+        <script src="{% static '/pages/dashboard.js' %}"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+var url = "{% url 'monthly_registration_chart' %}";
+$.get(url).then(function(result){
+    var months = result.months.reverse()
+    var users = result.users_count.reverse()
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [{
+                label:  'Registered Users',
+                data: users,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });  
+})
+
+    
+</script>
 
     {% endblock %}

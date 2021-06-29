@@ -12,6 +12,7 @@ class Users(models.Model):
     address = models.CharField(max_length=100, null=True)
     image = models.ImageField(default='profile/default_pic.png',upload_to='profile/', null=True)
     forget_password_token = models.CharField(max_length=100, null=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 #------------- User Meetings Model Table --------------

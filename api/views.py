@@ -13,9 +13,16 @@ from django.core.files.base import ContentFile
 import uuid
 from uuid import uuid4
 from django.contrib.auth.decorators import login_required
-from .helpers import send_forget_password_mail, send_admin_forget_password_mail,send_user_change_email, nfcMail
+from .helpers import send_forget_password_mail, send_admin_forget_password_mail,send_user_change_email
 from django.http import HttpResponseRedirect
 from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth import update_session_auth_hash
+from chartit import DataPool, Chart
+from django.db.models import Q
+
+
+
+
 
 
 # Create your views here.
@@ -297,7 +304,41 @@ def admin_login(request):
 #------------- Reterive Dashboard In Admin Panel --------------
 @login_required
 def index(request):
-    return render(request, 'index.html')
+    data = Users.objects.all()
+    cus = {"username": data}
+    return render(request, 'index.html',cus)
+
+
+import datetime
+@csrf_exempt
+def RegisterationChart(request):
+    month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    labels = []
+    users_count = []
+    thisYear = True
+    current_date = datetime.date.today()
+    current_month = current_date.month
+    current_year = current_date.year
+    i=0
+    while i<12:
+        month = (current_month-i)-1
+        if month < 0:
+            month = month+12
+            thisYear = False
+        if thisYear == True:
+            date = month_names[month] +' '+ str(current_year)
+            users_reg_count = Users.objects.filter(Q(created_at__year=current_year) & Q(created_at__month=month+1)).count()
+            users_count.append(str(users_reg_count))
+
+        else:
+            date = month_names[month] +' '+str(current_year-1)
+            users_reg_count = Users.objects.filter(Q(created_at__year=current_year-1) & Q(created_at__month=month+1)).count()
+            users_count.append(str(users_reg_count))
+
+        i = i+1
+        labels.append(date)
+    
+    return JsonResponse({'months': labels, 'users_count': users_count}, safe=False)
 
 
 #------------- Reterive All Users In Admin Panel --------------
@@ -342,6 +383,7 @@ def admin_change_pwd(request):
                 superusers.password = super_pwd
                 superusers.save()
                 messages.info(request, 'Password Changed!!')
+                update_session_auth_hash(request, superusers)
                 return redirect('admin_change_pwd')
             else:
                 messages.info(request, 'Password Did Not Match!!')
@@ -491,21 +533,6 @@ def myprofile(request,id):
             return render(request,'404_error.html')
     else:
         return render(request,'404_error.html')
-
-
-#------------- Send Mail To NFC User Profile Page  --------------
-@csrf_exempt
-def nfc_mail(request):
-    if request.method == "POST":
-        name = request.POST['name']
-        email = request.POST['email']
-        subject = request.POST['subject']
-        message = request.POST['message']
-        sentto = request.POST['sentto']
-        nfcMail(name,email,subject,message,sentto) 
-        return render(request,'myprofile.html')
-    else:   
-        return render(request,'myprofile.html')
 
 
 #------------- Send User Change Email  --------------

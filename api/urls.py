@@ -27,5 +27,5 @@ urlpatterns = [
     path('admin_reset_pwd',views.admin_reset_pwd,name='admin_reset_pwd'),
     path('success',views.success,name='success'),
     path('myprofile/<str:id>',views.myprofile,name='myprofile'),
-    path('nfc_mail',views.nfc_mail,name='nfc_mail'),
+    path('monthly_registration_chart', views.RegisterationChart, name="monthly_registration_chart"),
 ]
