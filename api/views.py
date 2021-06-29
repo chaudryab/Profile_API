@@ -19,12 +19,7 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth import update_session_auth_hash
 from chartit import DataPool, Chart
 from django.db.models import Q
-
-
-
-
-
-
+import datetime
 # Create your views here.
 
 #------------- User Create --------------
@@ -309,7 +304,7 @@ def index(request):
     return render(request, 'index.html',cus)
 
 
-import datetime
+#------------- Users Registered Per Month Graph In Admin Panel --------------
 @csrf_exempt
 def RegisterationChart(request):
     month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
