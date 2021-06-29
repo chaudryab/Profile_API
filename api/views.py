@@ -422,7 +422,7 @@ def admin_forget_pwd(request):
         print(email)
         if superuser.email == email:
             send_admin_forget_password_mail(email)
-            messages.info(request, 'Email Send!!')
+            messages.info(request, 'Email Sent!!')
             return redirect('admin_forget_pwd')
         else:
             messages.info(request, 'Email Not Exist!!')
