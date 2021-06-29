@@ -445,7 +445,7 @@ def forget_password(request):
             send_forget_password_mail(email, token)
             data = {}
             data['error'] = False
-            data['success_msg'] = 'Email Send!!!'
+            data['success_msg'] = 'Email Sent!!!'
             return JsonResponse(data)
         else:
             data = {}
